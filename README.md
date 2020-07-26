@@ -65,7 +65,7 @@ const Counter = () => {
 
 ## Examples
 
-TodoMVC https://github.com/luvsic3/hisoka/tree/master/example
+See `/example`
 
 ## API
 
@@ -86,7 +86,7 @@ const someStore = createStore({
 Update state in actions
 
 ```js
-const someStore = createStore({
+const { dispatch } = createStore({
   actions: {
     increment(state, payload) {
       state.count += payload
@@ -97,7 +97,7 @@ const someStore = createStore({
           resolve()
         }, 1000)
       })
-      someStore.dispatch.increment(1)
+      dispatch.increment(1)
     },
   },
 })
@@ -120,8 +120,8 @@ const App = () => {
 Dispatch an Action to update state
 
 ```js
-const App = () => {
-  const { useSelector, dispatch } = counterStore
+const { useSelector, dispatch } = counterStore
+const Count = () => {
   const count = useStore(S => S.count)
   return (
     <div>
