@@ -1,8 +1,12 @@
-import React from 'React';
+import React from 'react';
 import { createStore } from '../src/index';
 import { renderHook, act } from '@testing-library/react-hooks';
-import { render } from '@testing-library/react';
+import { render, fireEvent, waitFor, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
+
+// fix screen.getByRole throw MutationObserver Error
+import MutationObserver from '@sheerun/mutationobserver-shim';
+window.MutationObserver = MutationObserver;
 
 const { useSelector, dispatch, getState, Provider } = createStore({
   state: {
@@ -93,9 +97,9 @@ test('Provider', async () => {
 
   expect(component.getByRole(role).textContent).toBe('10');
 
-  // fireEvent.click(component.getByRole(role));
+  fireEvent.click(component.getByRole(role));
 
-  // await waitFor(() => screen.getByRole(role));
-  // expect(component.getByRole(role).textContent).toBe('11');
+  await waitFor(() => screen.getByRole(role));
+  expect(component.getByRole(role).textContent).toBe('11');
   component.unmount();
 });
