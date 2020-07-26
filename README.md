@@ -1,167 +1,166 @@
-# TSDX React User Guide
+<img src="http://forsigner.com/images/dahlia/dahlia-stamen.svg"  align="center"/>
 
-Congrats! You just saved yourself hours of work by bootstrapping this project with TSDX. Let’s get you oriented with what’s here and how to use it.
+# Relax
 
-> This TSDX setup is meant for developing React components (not apps!) that can be published to NPM. If you’re looking to build an app, you should use `create-react-app`, `razzle`, `nextjs`, `gatsby`, or `react-static`.
+[![npm](https://img.shields.io/npm/v/relax-ts.svg)](https://www.npmjs.com/package/relax-ts) [![Build Status](https://travis-ci.org/luv-sic/relax.svg?branch=master)](https://travis-ci.org/luv-sic/relax) [![Coverage Status](https://coveralls.io/repos/github/luv-sic/relax/badge.svg?branch=master)](https://coveralls.io/github/luv-sic/relax?branch=master)
+[![npm](https://img.shields.io/badge/TypeScript-%E2%9C%93-007ACC.svg)](https://www.typescriptlang.org/) [![GitHub license](https://img.shields.io/github/license/luv-sic/relax.svg)](https://github.com/luv-sic/relax/blob/master/LICENSE)
 
-> If you’re new to TypeScript and React, checkout [this handy cheatsheet](https://github.com/sw-yx/react-typescript-cheatsheet/)
+> A React state management library Based on Hooks, it begins as a fork of [stamen](https://github.com/forsigner/stamen)
 
-## Commands
+## Feature
 
-TSDX scaffolds your new library inside `/src`, and also sets up a [Parcel-based](https://parceljs.org) playground for it inside `/example`.
+Relax is opinionated, it has these benefits:
 
-The recommended workflow is to run TSDX in one terminal:
+* Simplified API, like Vuex
+* Typescript friendly
+* Hooks based, no `connect、mapState`
+* Multiple store/module
 
-```bash
-npm start # or yarn start
+## Installation
+
+```sh
+yarn add relax-ts
 ```
 
-This builds to `/dist` and runs the project in watch mode so any edits you save inside `src` causes a rebuild to `/dist`.
-
-Then run the example inside another:
-
-```bash
-cd example
-npm i # or yarn to install dependencies
-npm start # or yarn start
-```
-
-The default example imports and live reloads whatever is in `/dist`, so if you are seeing an out of date component, make sure TSDX is running in watch mode like we recommend above. **No symlinking required**, [we use Parcel's aliasing](https://github.com/palmerhq/tsdx/pull/88/files).
-
-To do a one-off build, use `npm run build` or `yarn build`.
-
-To run tests, use `npm test` or `yarn test`.
-
-## Configuration
-
-Code quality is [set up for you](https://github.com/palmerhq/tsdx/pull/45/files) with `prettier`, `husky`, and `lint-staged`. Adjust the respective fields in `package.json` accordingly.
-
-### Jest
-
-Jest tests are set up to run with `npm test` or `yarn test`. This runs the test watcher (Jest) in an interactive mode. By default, runs tests related to files changed since the last commit.
-
-#### Setup Files
-
-This is the folder structure we set up for you:
-
-```shell
-/example
-  index.html
-  index.tsx       # test your component here in a demo app
-  package.json
-  tsconfig.json
-/src
-  index.tsx       # EDIT THIS
-/test
-  blah.test.tsx   # EDIT THIS
-.gitignore
-package.json
-README.md         # EDIT THIS
-tsconfig.json
-```
-
-#### React Testing Library
-
-We do not set up `react-testing-library` for you yet, we welcome contributions and documentation on this.
-
-### Rollup
-
-TSDX uses [Rollup v1.x](https://rollupjs.org) as a bundler and generates multiple rollup configs for various module formats and build settings. See [Optimizations](#optimizations) for details.
-
-### TypeScript
-
-`tsconfig.json` is set up to interpret `dom` and `esnext` types, as well as `react` for `jsx`. Adjust according to your needs.
-
-## Continuous Integration
-
-### Travis
-
-_to be completed_
-
-### Circle
-
-_to be completed_
-
-## Optimizations
-
-Please see the main `tsdx` [optimizations docs](https://github.com/palmerhq/tsdx#optimizations). In particular, know that you can take advantage of development-only optimizations:
+## Quick Start
 
 ```js
-// ./types/index.d.ts
-declare var __DEV__: boolean;
+import { createStore } from 'relax-ts'
 
-// inside your code...
-if (__DEV__) {
-  console.log('foo');
+const { useSelector, dispatch, Provider } = createStore({
+  state: {
+    count: 0,
+  },
+  actions: {
+    increment(state, payload: number) {
+      state.count += payload;
+    },
+    decrement(state, payload: number) {
+      state.count -= payload;
+    },
+    async asyncIncrement(state, payload: number) {
+      await new Promise(resolve => {
+        setTimeout(() => {
+          state.count += payload;
+          resolve()
+        }, 1000)
+      })
+      dispatch.increment(payload);
+    },
+  }
+})
+
+const Counter = () => {
+  const count = useSelector(S => S.count)
+  return (
+    <div>
+      <span>{count}</span>
+      <div>
+        <button onClick={() => dispatch.decrement(1)}>-</button>
+        <button onClick={() => dispatch.increment(1)}>+</button>
+        <button onClick={() => dispatch.asyncIncrement(1)}>async+</button>
+      </div>
+    </div>
+  )
 }
 ```
 
-You can also choose to install and use [invariant](https://github.com/palmerhq/tsdx#invariant) and [warning](https://github.com/palmerhq/tsdx#warning) functions.
+Check on CodeSandbox: [Basic](https://codesandbox.io/s/0vrrlkjx5w) | [Async](https://codesandbox.io/s/kmq65p3l97)
 
-## Module Formats
+## Examples
 
-CJS, ESModules, and UMD module formats are supported.
+- [Basic](https://github.com/luv-sic/relax/tree/master/examples/basic) - Most basic usage
+- [TodoMVC](https://github.com/luv-sic/relax/tree/master/examples/todomvc) - Relax version TodoMVC
 
-The appropriate paths are configured in `package.json` and `dist/index.js` accordingly. Please report if any issues are found.
+## Api
 
-## Using the Playground
+**Overview**
 
-```bash
-cd example
-npm i # or yarn to install dependencies
-npm start # or yarn start
+```js
+const someStore = createStore({
+  state: {},
+  reducers: {},
+  affects: {},
+})
+
+const { useSelector, dispatch } = someStore
 ```
 
-The default example imports and live reloads whatever is in `/dist`, so if you are seeing an out of date component, make sure TSDX is running in watch mode like we recommend above. **No symlinking required**!
+### state
 
-## Deploying the Playground
+The initial state of a Store.
 
-The Playground is just a simple [Parcel](https://parceljs.org) app, you can deploy it anywhere you would normally deploy that. Here are some guidelines for **manually** deploying with the Netlify CLI (`npm i -g netlify-cli`):
-
-```bash
-cd example # if not already in the example folder
-npm run build # builds to dist
-netlify deploy # deploy the dist folder
+```js
+const someStore = createStore({
+  state: {
+    count: 0,
+  },
+})
 ```
 
-Alternatively, if you already have a git repo connected, you can set up continuous deployment with Netlify:
+### reducers
 
-```bash
-netlify init
-# build command: yarn build && cd example && yarn && yarn build
-# directory to deploy: example/dist
-# pick yes for netlify.toml
+Two type action in Relax: reducers and effects, you can update state in reducers only.
+
+```js
+const someStore = createStore({
+  reducers: {
+    increment(state, payload) {
+      state.count += payload
+    },
+  },
+})
 ```
 
-## Named Exports
+### effects
 
-Per Palmer Group guidelines, [always use named exports.](https://github.com/palmerhq/typescript#exports) Code split inside your React app instead of your React library.
+You can handle async actions in effects. Such as Fecthing data via nenwork
 
-## Including Styles
-
-There are many ways to ship styles, including with CSS-in-JS. TSDX has no opinion on this, configure how you like.
-
-For vanilla CSS, you can include it at the root directory and add it to the `files` section in your `package.json`, so that it can be imported separately by your users and run through their bundler's loader.
-
-## Publishing to NPM
-
-We recommend using [np](https://github.com/sindresorhus/np).
-
-## Usage with Lerna
-
-When creating a new package with TSDX within a project set up with Lerna, you might encounter a `Cannot resolve dependency` error when trying to run the `example` project. To fix that you will need to make changes to the `package.json` file _inside the `example` directory_.
-
-The problem is that due to the nature of how dependencies are installed in Lerna projects, the aliases in the example project's `package.json` might not point to the right place, as those dependencies might have been installed in the root of your Lerna project.
-
-Change the `alias` to point to where those packages are actually installed. This depends on the directory structure of your Lerna project, so the actual path might be different from the diff below.
-
-```diff
-   "alias": {
--    "react": "../node_modules/react",
--    "react-dom": "../node_modules/react-dom"
-+    "react": "../../../node_modules/react",
-+    "react-dom": "../../../node_modules/react-dom"
-   },
+```js
+const someStore = createStore({
+  effects: {
+    async asyncIncrement() {
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve()
+        }, 1000)
+      })
+      someStore.dispatch('increment')
+    },
+  },
+})
 ```
 
-An alternative to fixing this problem would be to remove aliases altogether and define the dependencies referenced as aliases as dev dependencies instead. [However, that might cause other problems.](https://github.com/palmerhq/tsdx/issues/64)
+### useSelector
+
+Get state in view using react hooks api.
+
+```js
+const App = () => {
+  const { useSelector } = counterStore
+  const count = useSelector(S => S.count)
+  return <span>{count}</span>
+}
+```
+
+### dispatch
+
+Dispatch an Action to update state.
+
+```js
+const App = () => {
+  const { useSelector, dispatch } = counterStore
+  const count = useStore(S => S.count)
+  return (
+    <div>
+      <span>{count}</span>
+      <button onClick={() => dispatch('decrement')}>-</button>
+      <button onClick={() => dispatch('increment')}>+</button>
+    </div>
+  )
+}
+```
+
+## License
+
+[MIT License](https://github.com/luv-sic/relax/blob/master/LICENSE)
