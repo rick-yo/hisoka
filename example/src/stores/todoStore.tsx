@@ -15,7 +15,7 @@ interface State {
 export const initialState: State = {
   todos: [
     {
-      text: 'Use Stamen',
+      text: 'Use Hisoka',
       completed: false,
       id: 0,
     },
