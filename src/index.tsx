@@ -41,14 +41,14 @@ function createStore<S, A extends Actions<S>>(model: Model<S, A>) {
     return storeState;
   }
 
-  const dispatch = async <T extends keyof A>(
+  const dispatch = <T extends keyof A>(
     actionType: T,
     payload?: Parameters<A[T]>[1]
   ) => {
     const action = actions[actionType];
     const oldState = getState();
-    const nextState = await produce(oldState, async (draft: S) => {
-      await action(draft, payload);
+    const nextState = produce(oldState, (draft: S) => {
+      action(draft, payload);
     });
     // FIXME fix in nest dispatch, the outer dispatch execute later, may revert the update by inner dispatch
     // see test dispatch.asyncIncrement
