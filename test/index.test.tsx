@@ -31,7 +31,7 @@ const { useSelector, dispatch, getState, Provider } = createStore({
           resolve();
         }, 50);
       });
-      dispatch.increment(payload);
+      dispatch('increment', payload);
     },
   },
 });
@@ -46,26 +46,26 @@ test('useSelector', async () => {
   });
 
   await act(async () => {
-    await dispatch.increateWithoutPayload();
+    await dispatch('increateWithoutPayload');
   });
 
   expect(result.current).toBe(1);
 
   await act(async () => {
-    await dispatch.decrement(1);
-    await dispatch.decrement(1);
+    await dispatch('decrement', 1);
+    await dispatch('decrement', 1);
   });
 
   expect(result.current).toBe(-1);
 
   await act(async () => {
-    await dispatch.asyncIncrement(1);
+    await dispatch('asyncIncrement', 1);
   });
 
   expect(result.current).toBe(0);
 
   await act(async () => {
-    await dispatch.setCount(2);
+    await dispatch('setCount', 2);
   });
   expect(result.current).toBe(2);
 
@@ -76,7 +76,7 @@ test('Provider', async () => {
   const role = 'counter';
   function Counter() {
     const count = useSelector(s => s.count);
-    const handleIncrease = () => dispatch.increment(1);
+    const handleIncrease = () => dispatch('increment', 1);
     return (
       <div role={role} onClick={handleIncrease}>
         {count}

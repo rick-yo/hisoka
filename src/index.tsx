@@ -8,7 +8,7 @@ import React, {
 import equal from 'fast-deep-equal';
 import produce from 'immer';
 
-import { Model, Actions, StateSelector, Subscriber, Dispatch } from './typings';
+import { Model, Actions, StateSelector, Subscriber } from './typings';
 
 function createStore<S, A extends Actions<S>>(model: Model<S, A>) {
   const subscribers: Subscriber<S>[] = [];
@@ -41,26 +41,19 @@ function createStore<S, A extends Actions<S>>(model: Model<S, A>) {
     return storeState;
   }
 
-  function createDispatch() {
-    const actionKeys: Array<keyof A> = Object.keys(actions);
-    const dispatcher = actionKeys.reduce((dispatches, actionKey) => {
-      const action = actions[actionKey];
-      dispatches[actionKey] = async payload => {
-        const oldState = getState();
-        const nextState = await produce(oldState, async (draft: S) => {
-          await action(draft, payload);
-        });
-
-        // FIXME fix in nest dispatch, the outer dispatch execute later, may revert the update by inner dispatch
-        // see test dispatch.asyncIncrement
-        !equal(oldState, nextState) && notify(oldState, nextState);
-      };
-      return dispatches;
-    }, {} as Dispatch<S, A>);
-    return dispatcher;
-  }
-
-  const dispatch: Dispatch<S, A> = createDispatch();
+  const dispatch = async <T extends keyof A>(
+    actionType: T,
+    payload?: Parameters<A[T]>[1]
+  ) => {
+    const action = actions[actionType];
+    const oldState = getState();
+    const nextState = await produce(oldState, async (draft: S) => {
+      await action(draft, payload);
+    });
+    // FIXME fix in nest dispatch, the outer dispatch execute later, may revert the update by inner dispatch
+    // see test dispatch.asyncIncrement
+    !equal(oldState, nextState) && notify(oldState, nextState);
+  };
 
   function notify(oldState: S, nextState: S) {
     subscribers.forEach(subscriber => {
