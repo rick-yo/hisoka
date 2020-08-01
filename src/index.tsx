@@ -52,7 +52,7 @@ function createStore<S, A extends Actions<S>>(model: Model<S, A>) {
     });
     // FIXME fix in nest dispatch, the outer dispatch execute later, may revert the update by inner dispatch
     // see test dispatch.asyncIncrement
-    !equal(oldState, nextState) && notify(oldState, nextState);
+    notify(oldState, nextState);
   };
 
   function notify(oldState: S, nextState: S) {
