@@ -32,7 +32,7 @@ function createStore<S, A extends Actions<S>>(model: Model<S, A>) {
         const index = subscribers.indexOf(subscriber);
         subscribers.splice(index, 1);
       };
-    }, [selector]);
+    }, []);
 
     return state;
   }
